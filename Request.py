@@ -4,6 +4,7 @@ class Request:
 	"""docstring for ClassName"""
 	# request state codes
 	# spawned = 0, executing = 1 , buffered = 2 , inCoreQueue = 3
+	#global requestIdCounter
 	requestIdCounter = 0
 	def __init__(self, clientId, arrivalTimeDistributionLambda, serviceTimeDistribution, timeout, param1, param2 = None):
 		self.clientId = clientId
@@ -14,6 +15,7 @@ class Request:
 		self.param2 = param2
 		self.arrivalTime = self.getArrivalTime(arrivalTimeDistributionLambda)
 		self.requestId = self.requestIdCounter + 1
+		#self.requestIdCounter = self.requestIdCounter + 1;
 		self.threadId = -1
 
 		if param2 is None:
@@ -33,6 +35,7 @@ class Request:
 		return random.expovariate(expoLambda)
 
 	def getServiceTime(self, serviceTimeDistribution, param1, param2 = None):
+		serviceTime=0
 		if serviceTimeDistribution == 0: #constant 
 			serviceTime = param1
 		elif serviceTimeDistribution == 1: #uniform

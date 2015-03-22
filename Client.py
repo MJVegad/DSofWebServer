@@ -8,14 +8,16 @@ class Client:
 
 		self.clientId = clientId
 		self.thinkTimeDistribution = thinkTimeDistribution
+		self.paramThinkTime1 = 0
+		self.paramThinkTime2 = 0
 
 		if param2 is None:
 			self.thinkTime = self.getThinkTime(thinkTimeDistribution, param1)
-			self.param1 = param1
+			self.paramThinkTime1 = param1
 		else:
 			self.thinkTime = self.getThinkTime(thinkTimeDistribution, param1, param2)
-			self.param1 = param1
-			self.param2 = param2
+			self.paramThinkTime1 = param1
+			self.paramThinkTime2 = param2
 
 		self.clientStatus = clientStatus    #0 - thinking, 1 - waiting for response
 
@@ -29,4 +31,4 @@ class Client:
 			thinkTime = random.normalvariate(param1, param2) #param1 - Mu, param2 - Sigma
 		elif thinkTimeDistribution == 3: #exponential
 			thinkTime = random.expovariate(param1)   #param1 - lambda
-		return thinkTime		
+		return thinkTime

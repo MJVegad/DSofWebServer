@@ -1,3 +1,5 @@
+import Request
+
 class Buffer:
 	"""It realizes a FIFO queue of requests waiting (which doesn’t get any thread) to get executed"""
 	requestsInBuffer = []
@@ -9,8 +11,11 @@ class Buffer:
 		self.requestsInBuffer.append(request)
 
 	def removeFromBuffer(self):
-		request = self.requestsInBuffer[1]
-		self.requestsInBuffer = self.requestsInBuffer[2:]
+		request = Request.Request(-1,-1,-1,-1,-1)
+		if len(self.requestsInBuffer) != 0 :
+			request = self.requestsInBuffer[0]
+			if len(self.requestsInBuffer) == 1 :
+				self.requestsInBuffer = []
+			else :
+				self.requestsInBuffer = self.requestsInBuffer[1:]
 		return request
-		
-		

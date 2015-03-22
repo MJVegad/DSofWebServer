@@ -1,10 +1,11 @@
 class RequestList:
 	"""Maintains list of requests currently present in the system"""
-	requestsList = []
+	
+	requestList = []
 
 	def addToRequestList(self, request):
-		self.requestsList.append(request)
+		self.requestList.append(request)
 		
 
 	def removeFromRequestList(self):
-		self.requestsList = self.requestsList[2:]		
+		self.requestList = self.requestList[2:]		

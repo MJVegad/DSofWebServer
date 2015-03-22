@@ -4,6 +4,7 @@ class System:
 	"""All parameters related to the system to be simulated"""
 	def __init__(self, sizeOfBuffer, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime):
 		self.buffer = Buffer.Buffer(sizeOfBuffer)	
+		self.numberOfCores = numberOfCores
 		self.cores = []
 
 		for y in list(range(numberOfCores)):
