@@ -3,11 +3,14 @@ import Event
 
 class EventList:
 	"""docstring for EventList"""
-	def __init__(self, arg):
+	def __init__(self):
 		self.eventList = []
+
 	def enqueueEvent(self, event):
-		heapq.heappush(self.eventList, event)
+		self.eventList.append(event)
+
 	def dequeueEvent(self):
-		return heapq.heappop(self.eventList)
-	def __lt__(self, event):
-		return self.timestamp < event.timestamp
+		self.eventList.sort(key=lambda x: x.timestamp, reverse=True)
+		event = self.eventList[1]
+		self.eventList = self.eventList[2:]
+		return event
