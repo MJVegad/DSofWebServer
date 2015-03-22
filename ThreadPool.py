@@ -9,7 +9,7 @@ class  ThreadPool:
 	def allocateThread(self, requestId, coreId, threadId):
 		self.numberOfBusyThreads = self.numberOfBusyThreads + 1
 		threadStatus[threadId] = [requestId, coreId]
-	def freeThread(self, requestId):
+	def freeThread(self, threadId):
 		# yet to write logic for extracting key of thread to be deleted
 		del self.threadStatus[]
 	def getFreeThreadId(self):

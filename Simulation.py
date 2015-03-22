@@ -70,7 +70,7 @@ class Simulation:
 		 		self.requestList = self.requestList[:x-1] + self.requestList[x+1:]
 		 		break	 
 
-		self.system.threadPool.freeThread(request.requestId)
+		self.system.threadPool.freeThread(request.threadId)
 		client = clients[request.clientId]
 		client.clientStatus = 0;   #0 - thinking
         
@@ -79,9 +79,12 @@ class Simulation:
         else:
         	client.thinkTime = getThinkTime(client.thinkTimeDistribution, client.param1, client.param2)
 
-        if 
-        scheduleNextEvent = Event(self.simulationTime + self.system.contextSwitchTime, 3, self.getCoreIdFromThreadId(request.threadId))
-        self.eventList.enqueueEvent(scheduleNextEvent)
+        if(self.system.cores[self.getCoreIdFromThreadId(request.threadId)].queuedRequestsList is not []):
+        	scheduleNextEvent = Event(self.simulationTime + self.system.contextSwitchTime, 3, self.getCoreIdFromThreadId(request.threadId))
+        	self.eventList.enqueueEvent(scheduleNextEvent)
+        else:
+        	self.system.cores[self.getCoreIdFromThreadId(request.threadId)].coreState = 0        #0 - idle
+
         newRequest = Request(request.clientId, request.arrivalTimeDistributionLambda, request.serviceTimeDistribution, request.param1, request.timeout, request.param2)
         self.requestList.addToRequestList(newRequest)
         newEvent = Event(self.simulationTime + client.thinkTime, 0, newRequest.requestId)
@@ -104,3 +107,10 @@ class Simulation:
 		else :
 			quantamExpiredEvent = Event(self.simulationTime + timeQuantum, 1, dequedRequest.requestId)
 			self.eventList.enqueueEvent(quantamExpiredEvent)
+
+    def timeoutEventHandler(self, event):
+		request = self.getRequestFromEvent(event)
+		newRequest = Request(request.clientId, request.arrivalTimeDistributionLambda, request.serviceTimeDistribution, request.param1, request.timeout, request.param2)
+        self.requestList.addToRequestList(newRequest)
+        newEvent = Event(self.simulationTime, 0, newRequest.requestId)
+        self.eventList.enqueueEvent(newEvent)		
