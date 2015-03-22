@@ -10,8 +10,8 @@ class  ThreadPool:
 		self.numberOfBusyThreads = self.numberOfBusyThreads + 1
 		threadStatus[threadId] = [requestId, coreId]
 	def freeThread(self, threadId):
-		# yet to write logic for extracting key of thread to be deleted
-		del self.threadStatus[]
+		del self.threadStatus[threadId]
+
 	def getFreeThreadId(self):
 		# Returns a threadId of a free thread otherwise -1
 		if numberOfBusyThreads < numberOfThreads:
