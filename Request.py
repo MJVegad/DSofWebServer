@@ -3,9 +3,10 @@ import random
 class Request:
 	"""docstring for ClassName"""
 	# request state codes
-	# thinking = 0 , executing = 1 , buffered = 2 , inCoreQueue = 3
+	# spawned = 0, executing = 1 , buffered = 2 , inCoreQueue = 3
 	requestIdCounter = 0
-	def __init__(self, arrivalTimeDistributionLambda, serviceTimeDistribution, constantDistributionValue=None, uniformRangeA=None, uniformRangeB=None, normalMu=None, normalSigma=None, expoLambda=None, timeout):
+	def __init__(self, clientId, arrivalTimeDistributionLambda, serviceTimeDistribution, constantDistributionValue=None, uniformRangeA=None, uniformRangeB=None, normalMu=None, normalSigma=None, expoLambda=None, timeout):
+		self.clientId = clientId
 		self.requestState = 0
 		self.arrivalTime = random.expovariate(arrivalTimeDistributionLambda)
 		self.requestId = requestIdCounter + 1

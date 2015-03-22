@@ -10,8 +10,4 @@ class RequestList:
 
 
 	def removeFromRequestList(self):
-		self.requestsList = self.requestsList[2:]	
-
-
-    
-		
+		self.requestsList = self.requestsList[2:]		
