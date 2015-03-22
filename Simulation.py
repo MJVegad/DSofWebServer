@@ -37,6 +37,6 @@ class Simulation:
 		 		request.requestState = 3         #3 - inCoreQueue              
 		 		self.system.cores[coreId].enqueueRequest(request)	
 
-
-
-
+	def quantamExpiredEventHandler(self, event):
+		remainingServiceTime = remainingServiceTime - self.system.timeQuantum
+		event.

@@ -18,7 +18,6 @@ class Request:
 			self.serviceTime = random.normalvariate(normalMu,normalSigma)
 		elif serviceTimeDistribution == 3: #exponential
 			self.serviceTime = random.expovariate(expoLambda)	
-
 		self.remainingServiceTime = serviceTime
 		self.timeout = timeout
 	def setRequestState(self, requestState):

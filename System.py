@@ -10,10 +10,4 @@ class System:
 
 		self.threadPool = ThreadPool(numberOfThreads)
 		self.timeQuantum = timeQuantum
-		self.contextSwitchTime = contextSwitchTime
-
-
-	
-
-
-		
+		self.contextSwitchTime = contextSwitchTime		
