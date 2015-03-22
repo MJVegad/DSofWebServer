@@ -22,7 +22,7 @@ class Client:
 
 	def getThinkTime(self, thinkTimeDistribution, param1, param2 = None):
 		if thinkTimeDistribution == 0: #constant
-			thinkTime = constantDistributionValue
+			thinkTime = param1
 		elif thinkTimeDistribution == 1: #uniform
 			thinkTime = random.uniform(param1, param2) #param1 to param2- range a to b
 		elif thinkTimeDistribution == 2: #normal

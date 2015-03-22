@@ -6,11 +6,11 @@ class Buffer:
 		self.sizeOfBuffer = sizeOfBuffer
 
 	def addToBuffer(self,request):
-			self.requestsInBuffer.append(request)
+		self.requestsInBuffer.append(request)
 
 	def removeFromBuffer(self):
-		    request = self.requestsInBuffer[1]
-			self.requestsInBuffer = self.requestsInBuffer[2:]  #FIFO queue
-			return request
+		request = self.requestsInBuffer[1]
+		self.requestsInBuffer = self.requestsInBuffer[2:]
+		return request
 		
 		

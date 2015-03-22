@@ -1,21 +1,32 @@
-import math, System, Event, EventList, Request
+import math, System, Event, EventList, Request, RequestList, Client
 
 class Simulation:
 	"""To begin and keep track of simulation"""
 
-	def __init__(self, sizeOfBuffer, numberOfClients, thinkTimeDistribution, param1, param2=None, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime, eventList, requestList):
-		self.eventList = eventList
-
+	def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
+		self.eventList = EventList.EventList()
 		self.simulationTime = 0
-		
+		self.clients = []
+
 		for y in list(range(numberOfClients)):
-				self.clients[y] = Client(y, thinkTimeDistribution, param1, 0, param2)        #0 - thinking
+			self.clients.append(Client.Client(y, thinkTimeDistribution, paramThinkTime1, 0, paramThinkTime2))        #0 - thinking
 
-		self.system = System(sizeOfBuffer, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime)
-		self.requestList = requestList
+		self.requestList = RequestList.RequestList()
+		
+		for index in list(range(numberOfClients)):
+			if serviceTimeDistribution == 1 or serviceTimeDistribution == 2: # Uniform or Normal distribution
+				request = Request.Request(index, arrivalTimeDistributionLambda, serviceTimeDistribution, timeout, paramServiceTime1, paramServiceTime2)
+			else:
+				request = Request.Request(index, arrivalTimeDistributionLambda, serviceTimeDistribution, timeout, paramServiceTime1)
+			
+			self.requestList.addToRequestList(request)
+			newEvent = Event.Event(self.simulationTime + request.arrivalTime, 0, request.requestId)
+			self.eventList.enqueueEvent(newEvent)
 
-    def getCoreIdFromThreadId(self,threadId):
-		return threadId%self.system.numberOfCores
+		self.system = System.System(sizeOfBuffer, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime)
+
+	def getCoreIdFromThreadId(self,threadId):
+		return (threadId % self.system.numberOfCores)
 
 	def getRequestFromEvent(self, event):
 		for x in list(range(event.eventId)):
@@ -38,17 +49,17 @@ class Simulation:
 
 
 			if(self.system.cores[coreId].coreState == 0):     #0 - idle	
-		 		self.system.cores[coreId].coreState = 1       #1 - busy	
-		 		request.setRequestState(1)      #1 - executing 
-		 		if((request.remainingServiceTime) < self.system.timeQuantum):
-		 			newEvent = Event(self.simulationTime + request.remainingServiceTime, 1, request.requestId)
-		 			self.eventList.enqueueEvent(newEvent)
-		 		else:
-		 			newEvent = Event(self.simulationTime + timeQuantum ,2, request.requestId)
-		 			self.eventList.enqueueEvent(newEvent)
-		 	else:
-		 		request.setRequestState(3)         #3 - inCoreQueue              
-		 		self.system.cores[coreId].enqueueRequest(request)	
+				self.system.cores[coreId].coreState = 1       #1 - busy	
+				request.setRequestState(1)      #1 - executing 
+				if((request.remainingServiceTime) < self.system.timeQuantum):
+					newEvent = Event(self.simulationTime + request.remainingServiceTime, 1, request.requestId)
+					self.eventList.enqueueEvent(newEvent)
+				else:
+					newEvent = Event(self.simulationTime + timeQuantum ,2, request.requestId)
+					self.eventList.enqueueEvent(newEvent)
+			else:
+				request.setRequestState(3)         #3 - inCoreQueue              
+				self.system.cores[coreId].enqueueRequest(request)	
 
 
 	def quantamExpiredEH(self, event):
@@ -74,27 +85,26 @@ class Simulation:
 		client = clients[request.clientId]
 		client.clientStatus = 0;   #0 - thinking
         
-        if(client.param2 is None):
-        	client.thinkTime = getThinkTime(client.thinkTimeDistribution, client.param1)
-        else:
-        	client.thinkTime = getThinkTime(client.thinkTimeDistribution, client.param1, client.param2)
+		if(client.param2 is None):
+			client.thinkTime = getThinkTime(client.thinkTimeDistribution, client.param1)
+		else:
+			client.thinkTime = getThinkTime(client.thinkTimeDistribution, client.param1, client.param2)
 
-        if(self.system.cores[self.getCoreIdFromThreadId(request.threadId)].queuedRequestsList is not []):
-        	scheduleNextEvent = Event(self.simulationTime + self.system.contextSwitchTime, 3, self.getCoreIdFromThreadId(request.threadId))
-        	self.eventList.enqueueEvent(scheduleNextEvent)
-        else:
-        	self.system.cores[self.getCoreIdFromThreadId(request.threadId)].coreState = 0        #0 - idle
+		if(self.system.cores[self.getCoreIdFromThreadId(request.threadId)].queuedRequestsList is not []):
+			scheduleNextEvent = Event(self.simulationTime + self.system.contextSwitchTime, 3, self.getCoreIdFromThreadId(request.threadId))
+			self.eventList.enqueueEvent(scheduleNextEvent)
+		else:
+			self.system.cores[self.getCoreIdFromThreadId(request.threadId)].coreState = 0        #0 - idle
 
-        newRequest = Request(request.clientId, request.arrivalTimeDistributionLambda, request.serviceTimeDistribution, request.param1, request.timeout, request.param2)
-        self.requestList.addToRequestList(newRequest)
-        newEvent = Event(self.simulationTime + client.thinkTime, 0, newRequest.requestId)
-        self.eventList.enqueueEvent(newEvent)
+		newRequest = Request(request.clientId, request.arrivalTimeDistributionLambda, request.serviceTimeDistribution, request.param1, request.timeout, request.param2)
+		self.requestList.addToRequestList(newRequest)
+		newEvent = Event(self.simulationTime + client.thinkTime, 0, newRequest.requestId)
+		self.eventList.enqueueEvent(newEvent)
 
-        if(self.system.buffer.requestsInBuffer is not []):
+		if(self.system.buffer.requestsInBuffer is not []):
 			requestFromBuffer = self.system.buffer.removeFromBuffer()
 			newEvent = Event(self.simulationTime, 0, requestFromBuffer.requestId)
-            self.eventList.enqueueEvent(newEvent)
-
+			self.eventList.enqueueEvent(newEvent)
 
 	def scheduleNextRequestEH(self, event):
 		# get coreId on which next request is to be scheduled
@@ -108,9 +118,9 @@ class Simulation:
 			quantamExpiredEvent = Event(self.simulationTime + timeQuantum, 1, dequedRequest.requestId)
 			self.eventList.enqueueEvent(quantamExpiredEvent)
 
-    def timeoutEventHandler(self, event):
+	def timeoutEventHandler(self, event):
 		request = self.getRequestFromEvent(event)
 		newRequest = Request(request.clientId, request.arrivalTimeDistributionLambda, request.serviceTimeDistribution, request.param1, request.timeout, request.param2)
-        self.requestList.addToRequestList(newRequest)
-        newEvent = Event(self.simulationTime, 0, newRequest.requestId)
-        self.eventList.enqueueEvent(newEvent)		
+		self.requestList.addToRequestList(newRequest)
+		newEvent = Event(self.simulationTime, 0, newRequest.requestId)
+		self.eventList.enqueueEvent(newEvent)
