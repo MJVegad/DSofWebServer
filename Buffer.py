@@ -9,6 +9,8 @@ class Buffer:
 			self.requestsInBuffer.append(request)
 
 	def removeFromBuffer(self):
+		    request = self.requestsInBuffer[1]
 			self.requestsInBuffer = self.requestsInBuffer[2:]  #FIFO queue
+			return request
 		
 		
