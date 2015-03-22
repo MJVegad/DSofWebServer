@@ -4,18 +4,15 @@ import Event
 
 class EventList:
 	"""docstring for EventList"""
-	eventList = []
+
+	def __init__(self):
+		self.eventList = []
 
 	def enqueueEvent(self, event):
-		heapq.heappush(self.eventList, event)
-#		self.eventList.append(event)
-#		self.eventList = heapq.heapify(self.eventList, self.cmpFunction)
-	def dequeueEvent(self):
-		return heapq.heappop(self.eventList)
-	def __lt__(self, event):
-		#print ('comparison')
-		return self.timestamp < event.timestamp
+		self.eventList.append(event)
 
-#	def cmpFunction(event1, event2):
-		#print ('comparison')
-#		return event1.timestamp < event2.timestamp
+	def dequeueEvent(self):
+		self.eventList.sort(key=lambda x: x.timestamp)
+		event = self.eventList[0]
+		self.eventList = self.eventList[1:]
+		return event
