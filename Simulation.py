@@ -1,4 +1,4 @@
-import math, System
+import math, System, Event, EventList
 
 class Simulation:
 	"""To begin and keep track of simulation"""
@@ -14,9 +14,9 @@ class Simulation:
 
 	def arrivalEventHandler(self, event):
 		availableThreadId = self.system.threadPool.getFreeThreadId()
+		request = requestlist[event.id] 
 
 		if (availableThreadId == -1):
-			request = requestlist[event.id] 
 			request.setRequestState(2)  #2-buffered 
 			self.system.buffer.addToBuffer(request)
 		else:
@@ -26,5 +26,17 @@ class Simulation:
 
 			if(self.system.cores[coreId].coreState == 0):     #0 - idle	
 		 		self.system.cores[coreId].coreState = 1       #1 - busy	
-		 		requestlist[event.id].setRequestState(1)      #1 - executing 
+		 		request.setRequestState(1)      #1 - executing 
+		 		if((request.remainingServiceTime) < self.system.timeQuantum):
+		 			newEvent = Event(self.simulationTime + request.remainingServiceTime, 1, coreId)
+		 			EventList.enqueueEvent(newEvent)
+		 		else:
+		 			newEvent = Event(self.simulationTime + timeQuantum ,2, coreId)
+		 			EventList.enqueueEvent(newEvent)
+		 	else:
+		 		request.requestState = 3         #3 - inCoreQueue              
+		 		self.system.cores[coreId].enqueueRequest(request)	
+
+
+
 
