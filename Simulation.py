@@ -46,7 +46,7 @@ class Simulation:
 		 		self.system.cores[coreId].enqueueRequest(request)	
 
 
-	def quantamExpiredEventHandler(self, event):
+	def quantamExpiredEH(self, event):
 		remainingServiceTime = remainingServiceTime - self.system.timeQuantum
 		# 	get core id
 		#   get request object
@@ -55,8 +55,8 @@ class Simulation:
 		coreId = getCoreIdFromThreadId(request.threadId)
 		self.system.cores[coreId].enqueueRequest(request)
 		request.setRequestState(3)                  #3 - inCoreQueue
-		nextEvent = Event(self.simulationTime + contextSwitchTime, 3, request.requestId)
-		eventList.enqueueEvent(nextEvent)
+		nextEvent = Event(self.simulationTime + contextSwitchTime, 3, coreId)
+		self.eventList.enqueueEvent(nextEvent)
 
 	def departureEventHandler(self, event):
 		for x in list(range(event.requestId)):
@@ -64,3 +64,15 @@ class Simulation:
 		 		request = self.requestList[x]
 		 		self.requestList = self.requestList[:x-1] + self.requestList[x+1:]
 		 		break	 
+
+	def scheduleNextRequestEH(self, event):
+		# get coreId on which next request is to be scheduled
+		coreId = event.eventId
+		dequedRequest = self.system.cores[coreId].dequeRequest()
+		dequedRequest.setRequestState(1)		#1 - executing
+		if dequedRequest.remainingServiceTime < self.system.timeQuantum :
+			departureEvent = Event(self.simulationTime + remainingServiceTime, 1, dequedRequest.requestId)
+			self.eventList.enqueueEvent(departureEvent)
+		else :
+			quantamExpiredEvent = Event(self.simulationTime + timeQuantum, 1, dequedRequest.requestId)
+			self.eventList.enqueueEvent(quantamExpiredEvent)
