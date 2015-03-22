@@ -2,8 +2,10 @@ import math, System, Event, EventList, Request
 
 class Simulation:
 	"""To begin and keep track of simulation"""
+
 	def __init__(self, sizeOfBuffer, numberOfClients, thinkTimeDistribution, param1, param2=None, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime, eventList, requestList):
 		self.eventList = eventList
+
 		self.simulationTime = 0
 		
 		for y in list(range(numberOfClients)):
@@ -45,9 +47,21 @@ class Simulation:
 		 			newEvent = Event(self.simulationTime + timeQuantum ,2, request.requestId)
 		 			self.eventList.enqueueEvent(newEvent)
 		 	else:
-		 		request.requestState = 3         #3 - inCoreQueue              
+		 		request.setRequestState(3)         #3 - inCoreQueue              
 		 		self.system.cores[coreId].enqueueRequest(request)	
 
+
+	def quantamExpiredEH(self, event):
+		remainingServiceTime = remainingServiceTime - self.system.timeQuantum
+		# 	get core id
+		#   get request object
+		#   add request object in core queue
+		request = getRequestFromEvent(self, event)
+		coreId = getCoreIdFromThreadId(request.threadId)
+		self.system.cores[coreId].enqueueRequest(request)
+		request.setRequestState(3)                  #3 - inCoreQueue
+		nextEvent = Event(self.simulationTime + contextSwitchTime, 3, coreId)
+		self.eventList.enqueueEvent(nextEvent)
 
 	def departureEventHandler(self, event):
 		for x in list(range(event.requestId)):
@@ -55,6 +69,7 @@ class Simulation:
 		 		request = self.requestList[x]
 		 		self.requestList = self.requestList[:x-1] + self.requestList[x+1:]
 		 		break	 
+
 		self.system.threadPool.freeThread(request.requestId)
 		client = clients[request.clientId]
 		client.clientStatus = 0;   #0 - thinking
@@ -78,6 +93,14 @@ class Simulation:
             self.eventList.enqueueEvent(newEvent)
 
 
-
-
-
+	def scheduleNextRequestEH(self, event):
+		# get coreId on which next request is to be scheduled
+		coreId = event.eventId
+		dequedRequest = self.system.cores[coreId].dequeRequest()
+		dequedRequest.setRequestState(1)		#1 - executing
+		if dequedRequest.remainingServiceTime < self.system.timeQuantum :
+			departureEvent = Event(self.simulationTime + remainingServiceTime, 1, dequedRequest.requestId)
+			self.eventList.enqueueEvent(departureEvent)
+		else :
+			quantamExpiredEvent = Event(self.simulationTime + timeQuantum, 1, dequedRequest.requestId)
+			self.eventList.enqueueEvent(quantamExpiredEvent)

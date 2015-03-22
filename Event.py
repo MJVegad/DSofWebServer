@@ -4,4 +4,5 @@ class Event:
 	def __init__(self, timestamp, eventType, eventId):
 		self.timestamp = timestamp
 		self.eventType = eventType
-		self.requestId = eventId       # scheduleNextRequest - coreId       
+		self.eventId = eventId       # scheduleNextRequest - coreId       
+
