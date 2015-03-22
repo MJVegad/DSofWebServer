@@ -1,10 +1,9 @@
 class Core:
 	"""information related to each core(processor)"""
 
-	def __init__(self, coreId, coreState, queuedRequestsList):
+	def __init__(self, coreId, coreState):
 		self.coreId = coreId
 		self.coreState = coreState
-		self.queuedRequestsList = queuedRequestsList
 
 
 	def enqueueRequest(self, request):

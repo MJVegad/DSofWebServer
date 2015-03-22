@@ -6,7 +6,7 @@ class System:
 		self.buffer = Buffer(sizeOfBuffer)
 
 		for y in list(range(numberOfCores)):
-				self.cores[y] = Core(y, 0, [])
+				self.cores[y] = Core(y, 0)
 
 		self.threadPool = ThreadPool(numberOfThreads)
 		self.timeQuantum = timeQuantum
