@@ -7,6 +7,10 @@ class Request:
 	#global requestIdCounter
 	requestIdCounter = 0
 	def __init__(self, clientId, arrivalTimeDistributionLambda, serviceTimeDistribution, timeout, param1, param2 = None):
+		"""
+
+		:rtype :
+		"""
 		self.clientId = clientId
 		self.requestState = 0
 		self.arrivalTimeDistributionLambda = arrivalTimeDistributionLambda
@@ -14,8 +18,9 @@ class Request:
 		self.param1 = param1
 		self.param2 = param2
 		self.arrivalTime = self.getArrivalTime(arrivalTimeDistributionLambda)
-		self.requestId = self.requestIdCounter + 1
-		#self.requestIdCounter = self.requestIdCounter + 1;
+		self.requestId = Request.requestIdCounter
+		Request.requestIdCounter = Request.requestIdCounter + 1;
+
 		self.threadId = -1
 
 		if param2 is None:

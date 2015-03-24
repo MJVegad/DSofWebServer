@@ -4,8 +4,8 @@ class RequestList:
 	requestList = []
 
 	def addToRequestList(self, request):
-		self.requestList.append(request)
+		RequestList.requestList.append(request)
 		
 
 	def removeFromRequestList(self):
-		self.requestList = self.requestList[2:]		
+		RequestList.requestList = self.requestList[1:]

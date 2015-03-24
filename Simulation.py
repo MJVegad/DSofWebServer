@@ -3,6 +3,7 @@ import math, System, Event, EventList, Request, RequestList, Client
 class Simulation:
 	"""To begin and keep track of simulation"""
 
+
 	def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
 		self.eventList = EventList.EventList()
 		self.simulationTime = 0
@@ -20,8 +21,10 @@ class Simulation:
 				request = Request.Request(index, arrivalTimeDistributionLambda, serviceTimeDistribution, timeout, paramServiceTime1)
 			
 			self.requestList.addToRequestList(request)
+			#print (self.requestList.requestList[index].arrivalTime)
 			newEvent = Event.Event(self.simulationTime + request.arrivalTime, 0, request.requestId)
 			self.eventList.enqueueEvent(newEvent)
+
 
 		self.system = System.System(sizeOfBuffer, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime)
 
@@ -32,38 +35,43 @@ class Simulation:
 			return (threadId % self.system.numberOfCores)
 
 	def getRequestFromEvent(self, event):
-		request = Request.Request(-1,-1,-1,-1,-1)
-		for x in list(range(event.eventId)):
-		 	if (self.requestList.requestList[x].requestId == event.eventId):
-		 		request = self.requestList.requestList[x]
-		 		break		     	
-		return request
+		#request = Request.Request(-1,-1,-1,-1,-1)
+		#print (list(range(event.eventId)))
+		for x in list(range(len(self.requestList.requestList))):
+
+			if (self.requestList.requestList[x].requestId == event.eventId):
+				request = self.requestList.requestList[x]
+				return request
+				#break
+		#return request
 	
 
 	def arrivalEventHandler(self, event):
 		availableThreadId = self.system.threadPool.getFreeThreadId()
 		request = self.getRequestFromEvent(event)
 
-		if (availableThreadId == -1):
-			request.setRequestState(2)  #2-buffered 
-			self.system.buffer.addToBuffer(request)
-		else:
-			coreId = self.getCoreIdFromThreadId(availableThreadId)
-			self.system.threadPool.allocateThread(event.eventId, coreId)
-
-
-			if(self.system.cores[coreId].coreState == 0):     #0 - idle	
-				self.system.cores[coreId].coreState = 1       #1 - busy	
-				request.setRequestState(1)      #1 - executing 
-				if((request.remainingServiceTime) < self.system.timeQuantum):
-					newEvent = Event.Event(self.simulationTime + request.remainingServiceTime, 1, request.requestId)
-					self.eventList.enqueueEvent(newEvent)
-				else:
-					newEvent = Event.Event(self.simulationTime + self.system.timeQuantum ,2, request.requestId)
-					self.eventList.enqueueEvent(newEvent)
+		if request is not None:
+			if (availableThreadId == -1 or availableThreadId == None):
+				request.setRequestState(2)  #2-buffered
+				self.system.buffer.addToBuffer(request)
 			else:
-				request.setRequestState(3)         #3 - inCoreQueue              
-				self.system.cores[coreId].enqueueRequest(request)	
+				coreId = self.getCoreIdFromThreadId(availableThreadId)
+				print ('************'+ str(availableThreadId))
+				self.system.threadPool.allocateThread(event.eventId, coreId)
+
+
+				if(self.system.cores[coreId].coreState == 0):     #0 - idle
+					self.system.cores[coreId].coreState = 1       #1 - busy
+					request.setRequestState(1)      #1 - executing
+					if((request.remainingServiceTime) < self.system.timeQuantum):
+						newEvent = Event.Event(self.simulationTime + request.remainingServiceTime, 1, request.requestId)
+						self.eventList.enqueueEvent(newEvent)
+					else:
+						newEvent = Event.Event(self.simulationTime + self.system.timeQuantum ,2, request.requestId)
+						self.eventList.enqueueEvent(newEvent)
+				else:
+					request.setRequestState(3)         #3 - inCoreQueue
+					self.system.cores[coreId].enqueueRequest(request)
 
 
 	def quantamExpiredEventHandler(self, event):
@@ -79,17 +87,17 @@ class Simulation:
 		self.eventList.enqueueEvent(nextEvent)
 
 	def departureEventHandler(self, event):
-		request = Request.Request(-1,-1,-1,-1,-1)
-		for x in list(range(event.eventId)):
-		 	if (self.requestList.requestList[x].requestId == event.eventId):
-		 		request = self.requestList.requestList[x]
-		 		self.requestList.requestList = self.requestList.requestList[:x-1] + self.requestList.requestList[x+1:]
-		 		break	 
+		#request = Request.Request(-1,-1,-1,-1,-1)
+		for x in range(len(self.requestList.requestList)):
+			if (self.requestList.requestList[x].requestId == event.eventId):
+				request = self.requestList.requestList[x]
+				self.requestList.requestList = self.requestList.requestList[:x-1] + self.requestList.requestList[x+1:]
+				break
 
 		self.system.threadPool.freeThread(request.threadId)
 		client = self.clients[request.clientId]
 		client.clientStatus = 0;   #0 - thinking
-        
+
 		if(client.paramThinkTime2 is None):
 			client.thinkTime = client.getThinkTime(client.thinkTimeDistribution, client.paramThinkTime1)
 		else:
@@ -114,6 +122,7 @@ class Simulation:
 	def scheduleNextRequestEventHandler(self, event):
 		# get coreId on which next request is to be scheduled
 		coreId = event.eventId
+		print ('====================>'+str(self.system.cores[coreId].queuedRequestsList[0].requestId))
 		dequedRequest = self.system.cores[coreId].dequeueRequest()
 		dequedRequest.setRequestState(1)		#1 - executing
 		if dequedRequest.remainingServiceTime < self.system.timeQuantum :

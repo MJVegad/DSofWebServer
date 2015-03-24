@@ -1,18 +1,21 @@
 #from heapq import heappush, heappop
-import heapq
+import heapq, queue
 import Event
 
 class EventList:
 	"""docstring for EventList"""
+	eventList = queue.PriorityQueue()
 
-	def __init__(self):
-		self.eventList = []
 
 	def enqueueEvent(self, event):
-		self.eventList.append(event)
+		EventList.eventList.put((event.timestamp, event.eventType, event.eventId))
 
 	def dequeueEvent(self):
-		self.eventList.sort(key=lambda x: x.timestamp)
-		event = self.eventList[0]
-		self.eventList = self.eventList[1:]
+		tuple=EventList.eventList.get()
+		event=Event.Event(tuple[0],tuple[1],tuple[2])
 		return event
+
+
+
+
+
