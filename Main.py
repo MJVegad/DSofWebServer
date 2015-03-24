@@ -1,19 +1,23 @@
 import Simulation, Event, EventList
 
 print ('Starting simulation')
+print ('==================================')
 
 def printLogMessages(time, requestId, eventType):
-	print (str(time)+'			'+ str(requestId)+'			'+str(eventType))
+	print (str(time)+'	'+ str(requestId)+'	'+str(eventType))
 
 
-printLogMessages('Time', '			RequestId', '		EventType')
+#printLogMessages('Time', '	RequestId', '	EventType')
 
 #def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
-simulation = Simulation.Simulation(10, 8, 3, 1, 1, 1, 2, 1, 0, 0, 2, 1);
+simulation = Simulation.Simulation(10, 8, 3, 2, 1, 1, 10, 1, 0, 0, 2, 1);
 
-'''for index in list(range(len(simulation.eventList.eventList))):
-	print (simulation.eventList.eventList[index].eventId)
-	print (simulation.eventList.eventList[index].timestamp) '''
+'''
+for index in list(range(simulation.eventList.eventList.qsize())):
+	event = simulation.eventList.dequeueEvent()
+	printLogMessages(event.timestamp, event.eventId, event.eventType)
+
+'''
 
 while simulation.eventList.eventList is not [] and simulation.simulationTime < 20:
 #while simulation.eventList.eventList is not []:
@@ -34,11 +38,10 @@ while simulation.eventList.eventList is not [] and simulation.simulationTime < 2
 		simulation.quantamExpiredEventHandler(event)
 	elif eventType == 3 :
 		#printLogMessages(simulation.simulationTime, 'scheduleNextRequest', simulation.getRequestFromEvent(event).requestId)
+		printLogMessages(simulation.simulationTime, event.eventId, 'core id for scheduleNextRequest')
 		simulation.scheduleNextRequestEventHandler(event)
 	elif eventType == 4 :
 		printLogMessages(simulation.simulationTime, event.eventId,'clientTimeout')
 		simulation.timeoutEventHandler(event)
 
 print ('Simulation Completed')
-
-

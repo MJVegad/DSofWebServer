@@ -5,7 +5,6 @@ class RequestList:
 
 	def addToRequestList(self, request):
 		RequestList.requestList.append(request)
-		
 
 	def removeFromRequestList(self):
 		RequestList.requestList = self.requestList[1:]
