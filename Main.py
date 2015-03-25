@@ -11,7 +11,7 @@ def printLogMessages(time, requestId, eventType):
 
 #def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
 
-simulation = Simulation.Simulation(10, 8, 5, 2, 1, 1, 10, 1, 0, 0, 2, 1);
+simulation = Simulation.Simulation(10, 8, 10, 5, 2, 1, 20, 1, 1, 1, 2, 2, 5, 7);
 
 
 '''
@@ -21,7 +21,7 @@ for index in list(range(simulation.eventList.eventList.qsize())):
 
 '''
 
-while (not simulation.eventList.eventList.empty() and simulation.simulationTime < 40):
+while (not simulation.eventList.eventList.empty() and simulation.simulationTime < 20):
 #while simulation.eventList.eventList is not []:
 
 	event = simulation.eventList.dequeueEvent()
