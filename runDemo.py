@@ -1,14 +1,17 @@
-import sys, os.path
+import sys, os
+from subprocess import call
+
+#os.system('Main.py')
 
 def returnCmdStr(noOfArg) :
-	cmdString = ''
+	cmdString = ['python3', 'Main.py']
 	for index in range(noOfArg) :
 		intVal = int(commandLineArgs[index])
-		cmdString = cmdString + ' ' + str(intVal)
+		cmdString.append(str(intVal))
 	return cmdString
 
-if len(sys.argv) < 3 :
-	print ('Command line format :: runDemo.sh <input-file> <output-file>')
+if len(sys.argv) < 2 :
+	print ('Command line format :: runDemo.sh <input-file>')
 	exit()
 
 if not os.path.isfile(sys.argv[1]) :
@@ -29,6 +32,6 @@ if commandLineArgs[12] == '\n' and commandLineArgs[13] == '\n':
 elif commandLineArgs[12] == '\n' or commandLineArgs[13] == '\n':
 	commandLineString = returnCmdStr(13)
 else:
-	commandLineString = returnCmdStr(14)
+	commandLineString = returnCmdStr(14)	
 
-os.system("Main.py" + commandLineString)	
+call(commandLineString)

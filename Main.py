@@ -6,9 +6,6 @@ print ('==================================')
 def printLogMessages(time, requestId, eventType):
 	print (str(time)+'	'+ str(requestId)+'	'+str(eventType))
 
-
-#printLogMessages('Time', '	RequestId', '	EventType')
-
 #def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
 
 simulation = Simulation.Simulation(10, 7, 10, 5, 4, 1, 20, 1, 1, 1, 2, 2, 5, 2);
