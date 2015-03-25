@@ -13,6 +13,7 @@ class Buffer:
 
 	def removeFromBuffer(self):
 		request = Request.Request(-1,-1,-1,-1,-1)
+
 		if len(self.requestsInBuffer) != 0 :
 			request = self.requestsInBuffer[0]
 			if len(self.requestsInBuffer) == 1 :
