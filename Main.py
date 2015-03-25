@@ -9,7 +9,7 @@ def printLogMessages(time, requestId, eventType):
 printLogMessages('Time', '			RequestId', '		EventType')
 
 #def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
-simulation = Simulation.Simulation(10, 8, 3, 1, 1, 1, 2, 1, 0, 0, 2, 1);
+simulation = Simulation.Simulation(10, 8, 1, 1, 1, 1, 2, 1, 0, 0, 2, 1);
 
 '''for index in list(range(len(simulation.eventList.eventList))):
 	print (simulation.eventList.eventList[index].eventId)

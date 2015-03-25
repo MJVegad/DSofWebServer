@@ -87,7 +87,7 @@ class Simulation:
 		self.eventList.enqueueEvent(nextEvent)
 
 	def departureEventHandler(self, event):
-		#request = Request.Request(-1,-1,-1,-1,-1)
+		request = Request.Request(-1,-1,-1,-1,-1)
 		for x in range(len(self.requestList.requestList)):
 			if (self.requestList.requestList[x].requestId == event.eventId):
 				request = self.requestList.requestList[x]
@@ -122,15 +122,16 @@ class Simulation:
 	def scheduleNextRequestEventHandler(self, event):
 		# get coreId on which next request is to be scheduled
 		coreId = event.eventId
-		print ('====================>'+str(self.system.cores[coreId].queuedRequestsList[0].requestId))
-		dequedRequest = self.system.cores[coreId].dequeueRequest()
-		dequedRequest.setRequestState(1)		#1 - executing
-		if dequedRequest.remainingServiceTime < self.system.timeQuantum :
-			departureEvent = Event.Event(self.simulationTime + dequedRequest.remainingServiceTime, 1, dequedRequest.requestId)
-			self.eventList.enqueueEvent(departureEvent)
-		else :
-			quantamExpiredEvent = Event.Event(self.simulationTime + self.system.timeQuantum, 1, dequedRequest.requestId)
-			self.eventList.enqueueEvent(quantamExpiredEvent)
+		#print ('====================>'+str(self.system.cores[coreId].queuedRequestsList[0].requestId))
+		if self.system.cores[coreId].queuedRequestsList is not []:
+			dequedRequest = self.system.cores[coreId].dequeueRequest()
+			dequedRequest.setRequestState(1)		#1 - executing
+			if dequedRequest.remainingServiceTime < self.system.timeQuantum :
+				departureEvent = Event.Event(self.simulationTime + dequedRequest.remainingServiceTime, 1, dequedRequest.requestId)
+				self.eventList.enqueueEvent(departureEvent)
+			else :
+				quantamExpiredEvent = Event.Event(self.simulationTime + self.system.timeQuantum, 1, dequedRequest.requestId)
+				self.eventList.enqueueEvent(quantamExpiredEvent)
 
 	def timeoutEventHandler(self, event):
 		request = self.getRequestFromEvent(event)

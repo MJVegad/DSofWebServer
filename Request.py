@@ -6,6 +6,7 @@ class Request:
 	# spawned = 0, executing = 1 , buffered = 2 , inCoreQueue = 3
 	#global requestIdCounter
 	requestIdCounter = 0
+
 	def __init__(self, clientId, arrivalTimeDistributionLambda, serviceTimeDistribution, timeout, param1, param2 = None):
 		"""
 
@@ -18,8 +19,12 @@ class Request:
 		self.param1 = param1
 		self.param2 = param2
 		self.arrivalTime = self.getArrivalTime(arrivalTimeDistributionLambda)
-		self.requestId = Request.requestIdCounter
-		Request.requestIdCounter = Request.requestIdCounter + 1;
+
+		if(clientId == -1):
+			self.requestId = -1
+		else:
+			self.requestId = Request.requestIdCounter
+			Request.requestIdCounter = Request.requestIdCounter + 1;
 
 		self.threadId = -1
 

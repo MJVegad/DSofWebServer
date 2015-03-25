@@ -11,8 +11,8 @@ class  ThreadPool:
 			self.threadStatus.append(0)						# 0 - free thread
 	
 	def allocateThread(self, requestId, coreId):
-		self.numberOfBusyThreads = self.numberOfBusyThreads + 1
 		threadId = self.getFreeThreadId()
+		self.numberOfBusyThreads = self.numberOfBusyThreads + 1
 		self.threadStatus[threadId] = 1
 
 	def freeThread(self, threadId):
