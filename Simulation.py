@@ -24,6 +24,8 @@ class Simulation:
 			#print (self.requestList.requestList[index].arrivalTime)
 			newEvent = Event.Event(self.simulationTime + request.arrivalTime, 0, request.requestId)
 			self.eventList.enqueueEvent(newEvent)
+			newEvent1 = Event.Event(self.simulationTime + request.arrivalTime + request.timeout, 4, request.requestId)        #4 - timeout
+			self.eventList.enqueueEvent(newEvent1)
 
 		self.system = System.System(sizeOfBuffer, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime)
 
@@ -40,6 +42,8 @@ class Simulation:
 			if (self.requestList.requestList[x].requestId == event.eventId):
 				request = self.requestList.requestList[x]
 				return request
+			else:
+				pass
 				#break
 		#return request
 	
@@ -114,6 +118,8 @@ class Simulation:
 		self.requestList.addToRequestList(newRequest)
 		newEvent = Event.Event(self.simulationTime + client.thinkTime, 0, newRequest.requestId)
 		self.eventList.enqueueEvent(newEvent)
+		newEvent1 = Event.Event(self.simulationTime + client.thinkTime + newRequest.timeout, 4, newRequest.requestId)        #4 - timeout
+		self.eventList.enqueueEvent(newEvent1)
 
 		if(self.system.buffer.requestsInBuffer):
 			requestFromBuffer = self.system.buffer.removeFromBuffer()
@@ -137,10 +143,20 @@ class Simulation:
 				quantamExpiredEvent = Event.Event(self.simulationTime + self.system.timeQuantum, 1, dequedRequest.requestId)
 				self.eventList.enqueueEvent(quantamExpiredEvent)
 
+	def printLogMessages(self, time, requestId, eventType):
+		print (str(time)+'	'+ str(requestId)+'	'+str(eventType))
+
+
 
 	def timeoutEventHandler(self, event):
 		request = self.getRequestFromEvent(event)
-		newRequest = Request.Request(request.clientId, request.arrivalTimeDistributionLambda, request.serviceTimeDistribution, request.param1, request.timeout, request.param2)
-		self.requestList.addToRequestList(newRequest)
-		newEvent = Event.Event(self.simulationTime, 0, newRequest.requestId)
-		self.eventList.enqueueEvent(newEvent)
+		if request is not None:
+			self.printLogMessages(self.simulationTime, event.eventId,'clientTimeout')
+			newRequest = Request.Request(request.clientId, request.arrivalTimeDistributionLambda, request.serviceTimeDistribution, request.param1, request.timeout, request.param2)
+			self.requestList.addToRequestList(newRequest)
+			newEvent = Event.Event(self.simulationTime, 0, newRequest.requestId)
+			self.eventList.enqueueEvent(newEvent)
+			newEvent1 = Event.Event(self.simulationTime + newRequest.timeout, 4, newRequest.requestId)
+			self.eventList.enqueueEvent(newEvent1)
+
+
