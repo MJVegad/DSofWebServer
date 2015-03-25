@@ -11,7 +11,7 @@ def printLogMessages(time, requestId, eventType):
 
 #def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
 
-simulation = Simulation.Simulation(10, 8, 5, 2, 1, 1, 10, 1, 0, 0, 2, 1);
+simulation = Simulation.Simulation(10, 7, 10, 5, 4, 1, 20, 1, 1, 1, 2, 2, 5, 2);
 
 
 '''
@@ -21,7 +21,7 @@ for index in list(range(simulation.eventList.eventList.qsize())):
 
 '''
 
-while (not simulation.eventList.eventList.empty() and simulation.simulationTime < 40):
+while (not simulation.eventList.eventList.empty() and simulation.simulationTime < 5):
 #while simulation.eventList.eventList is not []:
 
 	event = simulation.eventList.dequeueEvent()
@@ -43,7 +43,7 @@ while (not simulation.eventList.eventList.empty() and simulation.simulationTime 
 		printLogMessages(simulation.simulationTime, event.eventId, 'core id for scheduleNextRequest')
 		simulation.scheduleNextRequestEventHandler(event)
 	elif eventType == 4 :
-		printLogMessages(simulation.simulationTime, event.eventId,'clientTimeout')
+		#printLogMessages(simulation.simulationTime, event.eventId,'clientTimeout')
 		simulation.timeoutEventHandler(event)
 
 print ('Simulation Completed')
