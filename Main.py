@@ -18,8 +18,8 @@ simulation = Simulation.Simulation(10, 7, 10, 5, 4, 1, 20, 1, 1, 1, 2, 2, 5, 2);
 for index in list(range(simulation.eventList.eventList.qsize())):
 	event = simulation.eventList.dequeueEvent()
 	printLogMessages(event.timestamp, event.eventId, event.eventType)
-
 '''
+
 
 while (not simulation.eventList.eventList.empty() and simulation.simulationTime < 5):
 #while simulation.eventList.eventList is not []:
