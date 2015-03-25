@@ -9,11 +9,12 @@ class  ThreadPool:
 		# Threadstatus is a dictionary where key will be thread id and value will be a list whose first element will be request id and 2nd elelemt will be core id
 		for index in list(range(self.numberOfThreads)) :
 			self.threadStatus.append(0)						# 0 - free thread
-	
-	def allocateThread(self, requestId, coreId):
+
+	def allocateThread(self):
 		threadId = self.getFreeThreadId()
 		self.numberOfBusyThreads = self.numberOfBusyThreads + 1
 		self.threadStatus[threadId] = 1
+		#self.numberOfBusyThreads = self.numberOfBusyThreads + 1
 
 	def freeThread(self, threadId):
 		self.threadStatus[threadId] = 0
