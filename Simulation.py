@@ -62,7 +62,7 @@ class Simulation:
 			if (availableThreadId == -1 or availableThreadId == None):
                 #if thread is not available, buffer the request
 				request.setRequestState(2)
-				self.system.buffer.addToBuffer(request)
+				self.system.buffer.addToBuffer(request, self.requestList)
 			else:
 				request.threadId = availableThreadId
 				coreId = self.getCoreIdFromThreadId(availableThreadId)
