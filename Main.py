@@ -1,4 +1,4 @@
-import Simulation, Event, EventList
+import Simulation, Event, EventList,configobj, sys
 
 print ('Starting simulation')
 print ('==================================')
@@ -7,8 +7,16 @@ def printLogMessages(time, requestId, eventType):
 	print (str(time)+'	'+ str(requestId)+'	'+str(eventType))
 
 #def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
-
-simulation = Simulation.Simulation(10, 3, 10, 5, 4, 1, 20, 1, 1, 1, 2, 2, 5, 5)
+configFile = sys.argv[1]
+config = configobj.ConfigObj(configFile)
+if config['TTPARAMOPTIONAL']=='None' and config['STPARAMOPTIONAL']=='None':
+	simulation = Simulation.Simulation(int(config['SIZEOFBUFFER']),int(config['TIMEOUT']),int(config['NUMBEROFTHREADS']),int(config['NUMBEROFCORES']),int(config['TIMEQUANTUM']),int(config['CONTEXTSWITCHTIME']),int(config['NUMBEROFCLIENTS']),int(config['ARRIVALTIMEDISTRIBUTIONLAMBDA']),int(config['THINKTIMEDISTRIBUTION']),int(config['SERVICETIMEDISTRIBUTION']),int(config['THINKTIMEPARAM']),int(config['SERVICETIMEPARAM']))
+elif config['TTPARAMOPTIONAL']=='None':
+	simulation = Simulation.Simulation(int(config['SIZEOFBUFFER']),int(config['TIMEOUT']),int(config['NUMBEROFTHREADS']),int(config['NUMBEROFCORES']),int(config['TIMEQUANTUM']),int(config['CONTEXTSWITCHTIME']),int(config['NUMBEROFCLIENTS']),int(config['ARRIVALTIMEDISTRIBUTIONLAMBDA']),int(config['THINKTIMEDISTRIBUTION']),int(config['SERVICETIMEDISTRIBUTION']),int(config['THINKTIMEPARAM']),int(config['SERVICETIMEPARAM']),0,int(config['STPARAMOPTIONAL']))
+elif config['STPARAMOPTIONAL']=='None':
+	simulation = Simulation.Simulation(int(config['SIZEOFBUFFER']),int(config['TIMEOUT']),int(config['NUMBEROFTHREADS']),int(config['NUMBEROFCORES']),int(config['TIMEQUANTUM']),int(config['CONTEXTSWITCHTIME']),int(config['NUMBEROFCLIENTS']),int(config['ARRIVALTIMEDISTRIBUTIONLAMBDA']),int(config['THINKTIMEDISTRIBUTION']),int(config['SERVICETIMEDISTRIBUTION']),int(config['THINKTIMEPARAM']),int(config['SERVICETIMEPARAM']),int(config['TTPARAMOPTIONAL']))
+else :
+	simulation = Simulation.Simulation(int(config['SIZEOFBUFFER']),int(config['TIMEOUT']),int(config['NUMBEROFTHREADS']),int(config['NUMBEROFCORES']),int(config['TIMEQUANTUM']),int(config['CONTEXTSWITCHTIME']),int(config['NUMBEROFCLIENTS']),int(config['ARRIVALTIMEDISTRIBUTIONLAMBDA']),int(config['THINKTIMEDISTRIBUTION']),int(config['SERVICETIMEDISTRIBUTION']),int(config['THINKTIMEPARAM']),int(config['SERVICETIMEPARAM']),int(config['TTPARAMOPTIONAL']),int(config['STPARAMOPTIONAL']))
 
 
 while (not simulation.eventList.eventList.empty() and simulation.simulationTime < 7):
