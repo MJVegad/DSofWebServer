@@ -1,6 +1,9 @@
 class  ThreadPool:
-	"""ThreadPool for  """
-	# Index of thread will be from 1 to max number of threads
+	"""Pool of all the available threads
+	   numberOfThreads : maximum number of threads in the pool
+	   numberOfBusyThreads : number of threads currently allocated to any request
+	   threadStatus : list of status of each thread, free or busy"""
+
 	
 	def __init__(self, numberOfThreads):
 		self.numberOfThreads = numberOfThreads
@@ -10,16 +13,19 @@ class  ThreadPool:
 		for index in list(range(self.numberOfThreads)) :
 			self.threadStatus.append(0)						# 0 - free thread
 
+    #to allocate a thread to a request
 	def allocateThread(self):
 		threadId = self.getFreeThreadId()
 		self.numberOfBusyThreads = self.numberOfBusyThreads + 1
 		self.threadStatus[threadId] = 1
 		#self.numberOfBusyThreads = self.numberOfBusyThreads + 1
 
+    #to retain the thread from completed process
 	def freeThread(self, threadId):
 		self.threadStatus[threadId] = 0
 		self.numberOfBusyThreads = self.numberOfBusyThreads - 1
 
+    #to get free thread with lowest threadId
 	def getFreeThreadId(self):
 		# Returns a threadId of a free thread otherwise -1
 		if self.numberOfBusyThreads < self.numberOfThreads:

@@ -35,7 +35,7 @@ class Simulation:
 
 		self.system = System.System(sizeOfBuffer, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime)
 
-    #to get core to schedule the thread
+    #to get core to schedule the thread, by threadId % numberOfCores
 	def getCoreIdFromThreadId(self,threadId):
 		if threadId is None:
 			return -1
@@ -118,12 +118,14 @@ class Simulation:
 		client = self.clients[request.clientId]
 		client.clientStatus = 0   #0 - thinking
 
+        #compute think time for the client
 		if(client.paramThinkTime2 is None):
 			client.thinkTime = client.getThinkTime(client.thinkTimeDistribution, client.paramThinkTime1)
 		else:
 			client.thinkTime = client.getThinkTime(client.thinkTimeDistribution, client.paramThinkTime1, client.paramThinkTime2)
 
 		if(self.system.cores[self.getCoreIdFromThreadId(request.threadId)].queuedRequestsList.empty()):
+            #set core state to free
 			self.system.cores[self.getCoreIdFromThreadId(request.threadId)].coreState = 0        #0 - idle
 		else:
             #schedule next request from core queue
@@ -148,20 +150,23 @@ class Simulation:
     #to handle scheduling of the request from core queue
 	def scheduleNextRequestEventHandler(self, event):
 		coreId = event.eventId
-		#print ('====================>'+str(self.system.cores[coreId].queuedRequestsList[0].requestId))
 
 		if (not self.system.cores[coreId].queuedRequestsList.empty()):
+            #get next request from RR core queue
 			print('dequeueing request with core id : ' +str(coreId))
 			dequedRequest = self.system.cores[coreId].dequeueRequest()
 			print ('Schedule Next Request EH Request Id : '+ str(dequedRequest.requestId))
 			dequedRequest.setRequestState(1)		#1 - executing
 			if dequedRequest.remainingServiceTime <= self.system.timeQuantum :
+                #schedule departure of the request
 				departureEvent = Event.Event(self.simulationTime + dequedRequest.remainingServiceTime, 1, dequedRequest.requestId)
 				self.eventList.enqueueEvent(departureEvent)
 			else :
-				quantamExpiredEvent = Event.Event(self.simulationTime + self.system.timeQuantum, 1, dequedRequest.requestId)
+                #schedule time quantum expired event for request
+				quantamExpiredEvent = Event.Event(self.simulationTime + self.system.timeQuantum, 2, dequedRequest.requestId)
 				self.eventList.enqueueEvent(quantamExpiredEvent)
 
+    #to print log message
 	def printLogMessages(self, time, requestId, eventType):
 		print (str(time)+'	'+ str(requestId)+'	'+str(eventType))
 
@@ -170,11 +175,15 @@ class Simulation:
 	def timeoutEventHandler(self, event):
 		request = self.getRequestFromEvent(event)
 		if request is not None:
+            #request still resides in the system, so respective client timeout occurs
 			self.printLogMessages(self.simulationTime, event.eventId,'clientTimeout')
+            #client generates a new request
 			newRequest = Request.Request(request.clientId, request.arrivalTimeDistributionLambda, request.serviceTimeDistribution, request.param1, request.timeout, request.param2)
 			self.requestList.addToRequestList(newRequest)
+            #schedule arrival of the new request
 			newEvent = Event.Event(self.simulationTime, 0, newRequest.requestId)
 			self.eventList.enqueueEvent(newEvent)
+            #schedule timeout of the new request
 			newEvent1 = Event.Event(self.simulationTime + newRequest.timeout, 4, newRequest.requestId)
 			self.eventList.enqueueEvent(newEvent1)
 

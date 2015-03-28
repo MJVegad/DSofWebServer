@@ -1,7 +1,13 @@
 import Buffer, Core, ThreadPool
 
 class System:
-	"""All parameters related to the system to be simulated"""
+	"""All parameters related to the system to be simulated
+	   buffer : object of type Buffer, for buffer of the system
+	   cores : list of Core type objects
+	   threadPool : object of type ThreadPool, pool of all the available threads
+	   timeQuantum : timeQuantum of process on any core
+	   contextSwitchTime : switching time between two processes on any core """
+
 	def __init__(self, sizeOfBuffer, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime):
 		self.buffer = Buffer.Buffer(sizeOfBuffer)	
 		self.numberOfCores = numberOfCores

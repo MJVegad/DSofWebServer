@@ -1,8 +1,9 @@
-
 import Request
 
 class Buffer:
-	"""It realizes a FIFO queue of requests waiting (which doesn’t get any thread) to get executed"""
+	"""It realizes a FIFO queue of requests which are waiting (which doesn’t get any thread) to get executed.
+	   requestsInBuffer : contains list of Request objects, one for each request in the system """
+
 	requestsInBuffer = []
 
 	def __init__(self, sizeOfBuffer):
