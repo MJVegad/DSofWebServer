@@ -1,7 +1,8 @@
-import math, System, Event, EventList, Request, RequestList, Client
+import math, System, Event, EventList, Request, RequestList, Client, random
 
 class Simulation:
 	"""To initiate and keep track of experiment's objects throughout simulation. It's members are,
+	    randomSeed : seed to generate different distribution values
 	    eventList : object of type EventList
 	    simulationTime : to synch with time(clock) during simulation
 	    clients : contains list of Client type objects, one for each client
@@ -9,7 +10,8 @@ class Simulation:
 	    system : object of type System"""
 
 
-	def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
+	def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, randomSeed, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
+		random.seed(randomSeed)
 		self.eventList = EventList.EventList()
 		self.simulationTime = 0
 		self.clients = []
