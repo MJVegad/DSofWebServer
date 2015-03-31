@@ -19,7 +19,7 @@ else :
 	simulation = Simulation.Simulation(int(config['SIZEOFBUFFER']),int(config['TIMEOUT']),int(config['NUMBEROFTHREADS']),int(config['NUMBEROFCORES']),int(config['TIMEQUANTUM']),int(config['CONTEXTSWITCHTIME']),int(config['NUMBEROFCLIENTS']),int(config['RANDOMSEED']),int(config['ARRIVALTIMEDISTRIBUTIONLAMBDA']),int(config['THINKTIMEDISTRIBUTION']),int(config['SERVICETIMEDISTRIBUTION']),int(config['THINKTIMEPARAM']),int(config['SERVICETIMEPARAM']),int(config['TTPARAMOPTIONAL']),int(config['STPARAMOPTIONAL']))
 
 
-while (not simulation.eventList.eventList.empty() and simulation.simulationTime < 7):
+while (not simulation.eventList.eventList.empty() and simulation.departureCount < 77):
 #while simulation.eventList.eventList is not []:
 
 	event = simulation.eventList.dequeueEvent()
