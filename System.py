@@ -9,6 +9,7 @@ class System:
 	   contextSwitchTime : switching time between two processes on any core """
 
 	def __init__(self, sizeOfBuffer, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime):
+		Buffer.Buffer.initBufferCount()
 		self.buffer = Buffer.Buffer(sizeOfBuffer)	
 		self.numberOfCores = numberOfCores
 		self.cores = []

@@ -1,13 +1,16 @@
 class RequestList:
 	"""Maintains list of requests currently present in the system
-       requestList : list of request type objects"""
+	   requestList : list of request type objects"""
 	
-	requestList = []
+	#requestList = []
 
-    #to add new request object to requestList
+	def __init__(self):
+		self.requestList = []
+
+	#to add new request object to requestList
 	def addToRequestList(self, request):
 		self.requestList.append(request)
 
-    #to remove a request from requestList in FIFO manner
+	#to remove a request from requestList in FIFO manner
 	def removeFromRequestList(self):
 		self.requestList = self.requestList[1:]
