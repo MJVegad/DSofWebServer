@@ -9,5 +9,3 @@ if not os.path.isfile(sys.argv[1]) :
 	exit()
 
 os.system('python3' + ' Main.py ' + sys.argv[1])
-
-
