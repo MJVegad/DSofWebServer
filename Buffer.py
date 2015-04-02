@@ -25,6 +25,10 @@ class Buffer:
                     requestList.requestList = requestList.requestList[:x] + requestList.requestList[x+1:]
                     break
 
+    @staticmethod
+    def initBufferCount():
+        Buffer.bufferCount = 0
+
     def removeFromBuffer(self):
         request = Request.Request(-1,-1,-1,-1,-1)
 

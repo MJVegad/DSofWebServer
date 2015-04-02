@@ -1,4 +1,4 @@
-import math, System, Event, EventList, Request, RequestList, Client, random
+import math, System, Event, EventList, Request, RequestList, Client, random, Metrics
 
 class Simulation:
 	"""To initiate and keep track of experiment's objects throughout simulation. It's members are,
@@ -8,15 +8,17 @@ class Simulation:
 		clients : contains list of Client type objects, one for each client
 		requestList : object of type RequestList
 		system : object of type System
-		departureCount : keep track of count of no. of events departed"""
+		departureCount : keep track of count of no. of requests departed"""
 
 
 	def __init__(self, sizeOfBuffer, timeout, numberOfThreads, numberOfCores, timeQuantum, contextSwitchTime, numberOfClients, randomSeed, arrivalTimeDistributionLambda, thinkTimeDistribution, serviceTimeDistribution, paramThinkTime1, paramServiceTime1, paramThinkTime2=None, paramServiceTime2=None):
 		random.seed(randomSeed)
 		self.eventList = EventList.EventList()
+		Request.Request.initRequestId()
 		self.simulationTime = 0
 		self.departureCount = 0
 		self.clients = []
+
 
 		for y in list(range(numberOfClients)):
 			self.clients.append(Client.Client(y, thinkTimeDistribution, paramThinkTime1, 0, paramThinkTime2))        #0 - thinking
@@ -38,6 +40,8 @@ class Simulation:
 			self.eventList.enqueueEvent(newEvent1)
 
 		self.system = System.System(sizeOfBuffer, numberOfCores, numberOfThreads, timeQuantum, contextSwitchTime)
+
+		self.metrics = Metrics.Metrics()
 
 	#to get core to schedule the thread, by threadId % numberOfCores
 	def getCoreIdFromThreadId(self,threadId):
@@ -97,14 +101,26 @@ class Simulation:
 	def quantamExpiredEventHandler(self, event):
 		request = self.getRequestFromEvent(event)
 		request.remainingServiceTime = request.remainingServiceTime - self.system.timeQuantum
-		#put current request into core queue
+
 		coreId = self.getCoreIdFromThreadId(request.threadId)
-		self.system.cores[coreId].enqueueRequest(request)
-		print ('request ' + str(request.requestId) + 'enqueued in core' + str(coreId))
-		request.setRequestState(3)
-		#schedule next request from the queue
-		nextEvent = Event.Event(self.simulationTime + self.system.contextSwitchTime, 3, coreId)
-		self.eventList.enqueueEvent(nextEvent)
+		if not self.system.cores[coreId].queuedRequestsList.empty:
+			#put current request into core queue
+			self.system.cores[coreId].enqueueRequest(request)
+			print ('request ' + str(request.requestId) + 'enqueued in core' + str(coreId))
+			request.setRequestState(3)
+			#schedule next request from the queue
+			nextEvent = Event.Event(self.simulationTime + self.system.contextSwitchTime, 3, coreId)
+			self.eventList.enqueueEvent(nextEvent)
+		else:
+
+			if request.remainingServiceTime <= self.system.timeQuantum :
+				#schedule departure of the request
+				departureEvent = Event.Event(self.simulationTime + request.remainingServiceTime, 1, request.requestId)
+				self.eventList.enqueueEvent(departureEvent)
+			else :
+				#continue the same request without context switching
+				quantamExpiredEvent = Event.Event(self.simulationTime + self.system.timeQuantum, 2, request.requestId)
+				self.eventList.enqueueEvent(quantamExpiredEvent)
 
 	#to handle departure of request
 	def departureEventHandler(self, event):
@@ -115,9 +131,16 @@ class Simulation:
 				self.requestList.requestList = self.requestList.requestList[:x] + self.requestList.requestList[x+1:]
 				break
 
-        #increment departure count
+		#increment departure count
 		self.departureCount +=1
 		print ('Departure EH : thread Id ' + str(request.threadId) +'|||||||| departurecount: ' + str(self.departureCount))
+
+		# Departing request is actually a timeout request
+		if (request.arrivalTime + request.timeout) < self.simulationTime :
+			self.metrics.noOfTimeoutRequests += 1
+		else:
+			self.metrics.noOfRequestsWithoutTimeout += 1
+
 		#free the thread held by request
 		self.system.threadPool.freeThread(request.threadId)
 		#set the client state to thinking
@@ -153,6 +176,8 @@ class Simulation:
 			newEvent = Event.Event(self.simulationTime, 0, requestFromBuffer.requestId)
 			self.eventList.enqueueEvent(newEvent)
 
+		self.metrics.responseTime += (self.simulationTime - request.arrivalTime)
+
 	#to handle scheduling of the request from core queue
 	def scheduleNextRequestEventHandler(self, event):
 		coreId = event.eventId
@@ -184,7 +209,8 @@ class Simulation:
 			#request still resides in the system, so respective client timeout occurs
 			self.printLogMessages(self.simulationTime, event.eventId,'clientTimeout')
 			#client generates a new request
-			newRequest = Request.Request(request.clientId, request.arrivalTimeDistributionLambda, request.serviceTimeDistribution, request.param1, request.timeout, request.param2)
+			newRequest = Request.Request(request.clientId, request.arrivalTimeDistributionLambda, request.serviceTimeDistribution, request.timeout, request.param1, request.param2)
+			newRequest.arrivalTime = self.simulationTime
 			self.requestList.addToRequestList(newRequest)
 			#schedule arrival of the new request
 			newEvent = Event.Event(self.simulationTime, 0, newRequest.requestId)
@@ -192,5 +218,3 @@ class Simulation:
 			#schedule timeout of the new request
 			newEvent1 = Event.Event(self.simulationTime + newRequest.timeout, 4, newRequest.requestId)
 			self.eventList.enqueueEvent(newEvent1)
-
-
